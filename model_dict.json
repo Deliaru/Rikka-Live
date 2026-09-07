@@ -1,0 +1,251 @@
+[
+    {
+        "name": "mao_pro",
+        "description": "",
+        "url": "/live2d-models/mao_pro/runtime/mao_pro.model3.json",
+        "kScale": 0.5,
+        "initialXshift": 0,
+        "initialYshift": 0,
+        "kXOffset": 1150,
+        "idleMotionGroupName": "Idle",
+        "emotionMap": {
+            "neutral": 0,
+            "anger": 2,
+            "disgust": 2,
+            "fear": 1,
+            "joy": 3,
+            "smirk": 3,
+            "sadness": 1,
+            "surprise": 3
+        },
+        "tapMotions": {
+            "HitAreaHead": {
+                "": 1
+            },
+            "HitAreaBody": {
+                "": 1
+            }
+        }
+    },
+    {
+        "name": "rikka_mikazuki",
+        "description": "Local prepared Yayotsuki Rikka Live2D model.",
+        "url": "/live2d-models/rikka_mikazuki/rikka_mikazuki.model3.json",
+        "kScale": 0.28,
+        "initialXshift": 0,
+        "initialYshift": 0,
+        "kXOffset": 1150,
+        "idleMotionGroupName": "Idle",
+        "tapMotions": {
+            "HitAreaHead": {
+                "": 1
+            },
+            "HitAreaBody": {
+                "": 2
+            }
+        },
+        "expressionPresets": {
+            "neutral": {
+                "label": "平静",
+                "parameters": {},
+                "fade_ms": 300
+            },
+            "soft_smile": {
+                "label": "浅笑",
+                "parameters": {
+                    "ParamEyeLSmile": 0.35,
+                    "ParamEyeRSmile": 0.35,
+                    "ParamMouthForm": 0.15
+                },
+                "fade_ms": 400,
+                "hold_after_speech_ms": 2500
+            },
+            "happy": {
+                "label": "开心",
+                "parameters": {
+                    "ParamEyeLSmile": 0.8,
+                    "ParamEyeRSmile": 0.8,
+                    "ParamMouthForm": 0.6
+                },
+                "fade_ms": 400,
+                "hold_after_speech_ms": 2500
+            },
+            "curious": {
+                "label": "好奇",
+                "parameters": {
+                    "dengyan": 0.6,
+                    "ParamBrowLY": 1,
+                    "ParamBrowRY": 1,
+                    "ParamEyeBallY": 0.2
+                },
+                "fade_ms": 350,
+                "hold_after_speech_ms": 2200
+            },
+            "worried": {
+                "label": "担忧",
+                "parameters": {
+                    "Param93": 0.3,
+                    "ParamBrowLForm": -0.6,
+                    "ParamBrowRForm": -0.6
+                },
+                "fade_ms": 500,
+                "hold_after_speech_ms": 2800
+            },
+            "surprised": {
+                "label": "轻惊",
+                "parameters": {
+                    "dengyan": 0.55,
+                    "ParamMouthOpenY": 0.15
+                },
+                "fade_ms": 250,
+                "hold_after_speech_ms": 1800
+            },
+            "teasing": {
+                "label": "俏皮",
+                "parameters": {
+                    "ParamEyeLSmile": 0.5,
+                    "ParamMouthForm": 0.25,
+                    "ParamAngleZ": 2
+                },
+                "fade_ms": 400,
+                "hold_after_speech_ms": 2200
+            },
+            "quiet": {
+                "label": "安静",
+                "parameters": {
+                    "ParamEyeLOpen": -0.25,
+                    "ParamEyeROpen": -0.25,
+                    "ParamEyeBallY": -0.1
+                },
+                "fade_ms": 500,
+                "hold_after_speech_ms": 3000
+            },
+            "thinking": {
+                "label": "思索",
+                "parameters": {
+                    "ParamEyeBallX": -0.42,
+                    "ParamEyeBallY": -0.16,
+                    "ParamEyeLOpen": 0.7,
+                    "ParamEyeROpen": 0.7,
+                    "ParamBrowLY": -0.35,
+                    "ParamBrowRY": -0.2
+                },
+                "fade_ms": 400,
+                "hold_after_speech_ms": 2000
+            }
+        },
+        "gestureMap": {
+            "nod": {
+                "kind": "nod",
+                "amplitude": 1,
+                "duration_ms": 900,
+                "cooldown_ms": 1800
+            },
+            "tilt_head": {
+                "kind": "tilt",
+                "amplitude": 1,
+                "duration_ms": 1200,
+                "cooldown_ms": 1800
+            },
+            "look_close": {
+                "kind": "lean_in",
+                "amplitude": 1,
+                "duration_ms": 1400,
+                "cooldown_ms": 1600
+            },
+            "look_away": {
+                "kind": "look_away",
+                "amplitude": 1,
+                "duration_ms": 1600,
+                "cooldown_ms": 2200
+            },
+            "small_wave": {
+                "kind": "greeting_bob",
+                "amplitude": 1,
+                "duration_ms": 1300,
+                "cooldown_ms": 4200
+            },
+            "thinking": {
+                "kind": "think_pose",
+                "amplitude": 1,
+                "duration_ms": 1800,
+                "cooldown_ms": 2600
+            }
+        },
+        "idleMicro": {
+            "enabled": true,
+            "amplitude": 1
+        },
+        "identityParams": {
+            "Param84": 1.0
+        },
+        "speakingSmile": {
+            "gain": 0.02,
+            "max": 0.25
+        },
+        "gazeMap": {
+            "camera": {
+                "parameters": {
+                    "ParamAngleX": 0,
+                    "ParamAngleY": 0,
+                    "ParamAngleZ": 0,
+                    "ParamEyeBallX": 0,
+                    "ParamEyeBallY": 0
+                },
+                "hold_ms": 900,
+                "fade_ms": 180,
+                "restore_ms": 520
+            },
+            "chat": {
+                "parameters": {
+                    "ParamAngleX": -5,
+                    "ParamAngleY": -4,
+                    "ParamAngleZ": -2,
+                    "ParamEyeBallX": -0.25,
+                    "ParamEyeBallY": -0.18
+                },
+                "hold_ms": 1400,
+                "fade_ms": 220,
+                "restore_ms": 700
+            },
+            "game": {
+                "parameters": {
+                    "ParamAngleX": 6,
+                    "ParamAngleY": -2,
+                    "ParamAngleZ": 1,
+                    "ParamEyeBallX": 0.28,
+                    "ParamEyeBallY": -0.1
+                },
+                "hold_ms": 1600,
+                "fade_ms": 220,
+                "restore_ms": 700
+            },
+            "down": {
+                "parameters": {
+                    "ParamAngleX": 0,
+                    "ParamAngleY": -7,
+                    "ParamAngleZ": 0,
+                    "ParamEyeBallX": 0,
+                    "ParamEyeBallY": -0.34
+                },
+                "hold_ms": 1200,
+                "fade_ms": 220,
+                "restore_ms": 680
+            },
+            "away": {
+                "parameters": {
+                    "ParamAngleX": -9,
+                    "ParamAngleY": 2,
+                    "ParamAngleZ": -3,
+                    "ParamEyeBallX": -0.42,
+                    "ParamEyeBallY": 0.06
+                },
+                "hold_ms": 1200,
+                "fade_ms": 220,
+                "restore_ms": 720
+            }
+        },
+        "scrollToResize": true,
+        "pointerInteractive": true
+    }
+]

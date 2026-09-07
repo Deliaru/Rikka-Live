@@ -1,0 +1,1 @@
+"""Rikka Live extension tests."""

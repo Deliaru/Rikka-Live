@@ -1,0 +1,90 @@
+.blocker-panel {
+  background:
+    linear-gradient(135deg, rgb(255 143 178 / 0.08), transparent 56%),
+    var(--surface);
+  border-color: rgb(255 143 178 / 0.22);
+}
+
+.test-panel {
+  min-height: 240px;
+}
+
+.flow-layout > .panel {
+  min-height: 620px;
+}
+
+/* Flow 面板内的 timeline / event-list 改为固定高度内部滚动，
+   这样轮询重建 DOM 时滚动位置落在容器自身，与页面其他部分解耦，
+   配合 render.js 的 scrollTop 保护可稳定阅读长 log。 */
+.flow-layout .timeline {
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.flow-layout .event-list {
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+.event-row[data-diagnostic="true"] {
+  color: var(--warn);
+}
+
+.event-row button {
+  margin-top: 8px;
+}
+
+.event-row button[disabled] {
+  border-color: var(--line-soft);
+  color: var(--muted);
+}
+
+.log-file {
+  padding: 0;
+  overflow: hidden;
+}
+
+.log-file strong,
+.log-file small {
+  padding: 10px 10px 0;
+}
+
+.log-file .log-lines {
+  max-height: 360px;
+  margin: 10px 0 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.is-loading {
+  opacity: 0.72;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .panel-head {
+    justify-content: flex-start;
+  }
+
+  .panel-head .status-pill {
+    max-width: calc(100vw - 54px);
+  }
+
+  .kv-row {
+    grid-template-columns: 1fr;
+  }
+
+  .flow-layout > .panel {
+    min-height: 0;
+  }
+
+  .flow-layout .timeline,
+  .flow-layout .event-list {
+    max-height: 320px;
+  }
+}

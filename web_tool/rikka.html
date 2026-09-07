@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rikka Live Console</title>
+  <link rel="stylesheet" href="rikka/rikka.css">
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="rail" aria-label="Rikka Live navigation">
+      <div class="brand-block">
+        <span class="brand-mark" aria-hidden="true">R</span>
+        <div>
+          <strong>Rikka Live</strong>
+          <span>Diagnostic Console</span>
+        </div>
+      </div>
+      <nav class="rail-nav" aria-label="Console sections">
+        <button class="nav-button active" type="button" data-view="overview">总览</button>
+        <button class="nav-button" type="button" data-view="lab">测试台</button>
+        <button class="nav-button" type="button" data-view="flow">事件与 Flow</button>
+        <button class="nav-button" type="button" data-view="config">配置</button>
+        <button class="nav-button" type="button" data-view="logs">日志</button>
+      </nav>
+      <div class="rail-footer">
+        <a class="button ghost" href="/overlay/" target="_blank" rel="noopener noreferrer">打开 Overlay</a>
+        <span id="last-refresh">尚未刷新</span>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <h1 id="view-title">总览</h1>
+          <p id="view-subtitle">连接、阻塞点和最近动作</p>
+        </div>
+        <div class="topbar-actions">
+          <span id="app-status" class="status-pill warn">connecting</span>
+          <button id="refresh-current" class="button" type="button">刷新当前页</button>
+        </div>
+      </header>
+
+      <section id="view-overview" class="view active" aria-labelledby="view-title">
+        <div id="overview-grid" class="overview-grid"></div>
+        <div class="split-grid">
+          <section class="panel blocker-panel">
+            <div class="panel-head">
+              <h2>当前阻塞点</h2>
+              <span id="blocker-tone" class="status-pill">unknown</span>
+            </div>
+            <strong id="blocker-title" class="blocker-title">loading</strong>
+            <p id="blocker-detail" class="reason-line"></p>
+            <div id="next-actions" class="action-row"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>最后前端动作</h2>
+              <span id="frontend-action-age" class="status-pill">none</span>
+            </div>
+            <div id="frontend-action-detail" class="kv-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="view-lab" class="view" aria-labelledby="view-title">
+        <div class="lab-grid">
+          <section class="panel test-panel" data-test-card="live2d">
+            <div class="panel-head">
+              <h2>Live2D / Overlay</h2>
+              <span id="live2d-state" class="status-pill">unknown</span>
+            </div>
+            <p id="live2d-detail" class="reason-line"></p>
+            <div class="action-row">
+              <button id="test-live2d-refresh" class="button" type="button">刷新客户端</button>
+              <a class="button ghost" href="/overlay/" target="_blank" rel="noopener noreferrer">打开 Overlay</a>
+            </div>
+          </section>
+
+          <section class="panel test-panel" data-test-card="speak">
+            <div class="panel-head">
+              <h2>Debug Speak</h2>
+              <span id="speak-state" class="status-pill">idle</span>
+            </div>
+            <textarea id="debug-speak-text" rows="3">六花，做一次完整 debug speak，检查嘴型、动作和字幕。</textarea>
+            <div class="action-row">
+              <button id="test-debug-speak" class="button primary" type="button">发送 Debug Speak</button>
+            </div>
+            <pre id="speak-result" class="result-box"></pre>
+          </section>
+
+          <section class="panel test-panel" data-test-card="capture">
+            <div class="panel-head">
+              <h2>画面捕捉</h2>
+              <span id="capture-state" class="status-pill">unknown</span>
+            </div>
+            <p class="reason-line">先捕获允许窗口生成 latest frame；开启“附加到用户提问”后，再用 Overlay 麦克风或正常对话问“能看到什么”。</p>
+            <div id="capture-detail" class="kv-list"></div>
+            <div class="action-row">
+              <button id="test-capture-keyframe" class="button primary" type="button">捕获关键帧</button>
+              <button id="test-capture-windows" class="button" type="button">刷新窗口列表</button>
+              <button id="test-multimodal" class="button" type="button">测试手动上传入口</button>
+            </div>
+            <pre id="capture-result" class="result-box"></pre>
+          </section>
+
+          <section class="panel test-panel" data-test-card="proactive">
+            <div class="panel-head">
+              <h2>主动发言</h2>
+              <span id="proactive-state" class="status-pill">unknown</span>
+            </div>
+            <div id="proactive-detail" class="kv-list"></div>
+            <div class="action-row">
+              <button id="test-proactive-refresh" class="button primary" type="button">刷新主动状态</button>
+            </div>
+          </section>
+
+          <section class="panel test-panel wide" data-test-card="mic">
+            <div class="panel-head">
+              <h2>麦克风 / 唤醒</h2>
+              <span id="mic-state" class="status-pill">unknown</span>
+            </div>
+            <div id="mic-detail" class="kv-list"></div>
+            <label class="check-row"><input id="always-on-listening" type="checkbox"> 常驻监听（console 持有麦克风）</label>
+            <div class="action-row">
+              <span id="mic-owner-state" class="status-pill">owner unknown</span>
+              <button id="test-mic-permission" class="button primary" type="button">测试麦克风捕获</button>
+              <button id="test-asr-disabled" class="button" type="button">检测 ASR 状态</button>
+            </div>
+            <pre id="mic-result" class="result-box"></pre>
+          </section>
+        </div>
+      </section>
+
+      <section id="view-flow" class="view" aria-labelledby="view-title">
+        <div class="split-grid flow-layout">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Flow 阶段</h2>
+              <span id="flow-state" class="status-pill">unknown</span>
+            </div>
+            <div id="flow-stage-grid" class="stage-grid"></div>
+            <div id="flow-timeline" class="timeline"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Recent Events</h2>
+              <span class="status-pill">diagnostic guarded</span>
+            </div>
+            <div id="recent-events" class="event-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="view-config" class="view" aria-labelledby="view-title">
+        <form id="config-form" class="config-grid">
+          <section class="panel config-section" data-config-section="llm">
+            <div class="panel-head">
+              <h2>LLM</h2>
+              <span id="llm-ready" class="status-pill">unknown</span>
+            </div>
+            <label>Provider
+              <select id="llm-provider"></select>
+            </label>
+            <label>API Mode <input id="llm-api-mode" autocomplete="off"></label>
+            <label>Base URL <input id="llm-base-url" autocomplete="off"></label>
+            <label>Model <input id="llm-model" autocomplete="off"></label>
+            <label>API Key <input id="llm-api-key" type="password" autocomplete="new-password" placeholder="留空则不修改"></label>
+            <label>回应提示词 <textarea id="response-prompt" rows="10" spellcheck="false"></textarea></label>
+            <label>角色提示词 <textarea id="persona-prompt" rows="12" spellcheck="false"></textarea></label>
+          </section>
+
+          <section class="panel config-section" data-config-section="tts">
+            <div class="panel-head">
+              <h2>TTS / IndexTTS2</h2>
+              <span id="tts-ready" class="status-pill">unknown</span>
+            </div>
+            <label>Provider
+              <select id="tts-provider">
+                <option value="xiaomi_mimo_tts">xiaomi_mimo_tts</option>
+                <option value="indextts2_tts">indextts2_tts</option>
+              </select>
+            </label>
+            <label>Mode
+              <select id="index-mode">
+                <option value="cloud">cloud</option>
+                <option value="local">local</option>
+              </select>
+            </label>
+            <label>ModelVerse API Key <input id="index-api-key" type="password" autocomplete="new-password" placeholder="留空则不修改"></label>
+            <label>Cloud Voice ID <input id="index-voice-id" type="password" autocomplete="new-password" placeholder="留空则不修改"></label>
+            <label>Base URL <input id="index-base-url" autocomplete="off"></label>
+            <label>Model <input id="index-model" autocomplete="off"></label>
+            <label>Local API URL <input id="index-api-url" autocomplete="off"></label>
+            <label>Speaker Audio <input id="index-speaker-audio" autocomplete="off"></label>
+            <label>Default Style
+              <select id="index-default-style">
+                <option value="default">default</option>
+                <option value="quiet_companion">quiet_companion</option>
+              </select>
+            </label>
+            <div class="inline-grid">
+              <label>Segment Tokens <input id="index-segment" type="number" min="10" step="1"></label>
+              <label>Sentence Gap (ms) <input id="index-sentence-gap" type="number" min="0" max="3000" step="50"></label>
+            </div>
+            <label class="check-row"><input id="index-sentence-enabled" type="checkbox"> 云端/本地切句参数</label>
+            <label>Quiet Alpha <input id="index-quiet-alpha" type="number" min="0" max="1.2" step="0.01"></label>
+            <div id="index-vector-grid" class="emotion-grid"></div>
+            <div class="action-row">
+              <button id="apply-runtime-tts" class="button" type="button">应用运行时</button>
+              <button id="audition-runtime-tts" class="button" type="button">试听</button>
+            </div>
+            <p class="hint"><strong>音频尾音清理</strong>（保存 Rikka 设置生效）</p>
+            <label class="check-row"><input id="tts-post-enabled" type="checkbox"> 清理生成的 TTS 尾音</label>
+            <div class="inline-grid">
+              <label>最大裁剪 (ms) <input id="tts-post-trim-max" type="number" min="0" max="1000" step="10"></label>
+              <label>保护带 (ms) <input id="tts-post-trim-min-tail" type="number" min="0" max="300" step="5"></label>
+              <label>淡出 (ms) <input id="tts-post-fade-out" type="number" min="0" max="50" step="1"></label>
+              <label>阈值 (dBFS) <input id="tts-post-threshold-db" type="number" min="-60" max="-20" step="1"></label>
+            </div>
+            <p class="hint">仅处理音频尾部低能量段，保护带内的内容永不裁剪；阈值越低越保守。切 Provider 后建议重新试听调参。</p>
+          </section>
+
+          <section class="panel config-section" data-config-section="live2d">
+            <div class="panel-head">
+              <h2>Live2D / Overlay</h2>
+              <span id="overlay-ready" class="status-pill">unknown</span>
+            </div>
+            <label class="check-row"><input id="overlay-asr-hud-visible" type="checkbox"> 显示 Wake / ASR HUD</label>
+            <label class="check-row"><input id="overlay-pointer" type="checkbox"> 全局鼠标视线跟踪</label>
+            <label>追踪模式
+              <select id="overlay-pointer-mode">
+                <option value="natural_layered">natural layered</option>
+                <option value="classic_lapp">classic LApp</option>
+                <option value="off">off</option>
+              </select>
+            </label>
+            <div class="inline-grid">
+              <label>强度 <input id="overlay-pointer-intensity" type="number" min="0" max="2" step="0.05"></label>
+              <label>柔和度 <input id="overlay-pointer-smoothness" type="number" min="0" max="1" step="0.05"></label>
+              <label>死区 <input id="overlay-pointer-deadzone" type="number" min="0" max="0.4" step="0.01"></label>
+            </div>
+            <p class="hint">强度 / 柔和度 / 死区作用于 natural layered；classic LApp 保留原生回退手感。</p>
+            <label class="check-row"><input id="overlay-subtitle-visible" type="checkbox"> Overlay 字幕气泡</label>
+            <label>字幕布局
+              <select id="overlay-subtitle-layout">
+                <option value="anchor">anchor</option>
+                <option value="free">free</option>
+              </select>
+            </label>
+            <label>字幕锚点
+              <select id="overlay-subtitle-anchor">
+                <option value="bottom_left">bottom_left</option>
+                <option value="bottom_center">bottom_center</option>
+                <option value="bottom_right">bottom_right</option>
+              </select>
+            </label>
+            <div class="inline-grid">
+              <label>宽度 <input id="overlay-subtitle-width" type="number" min="240" max="1400" step="10"></label>
+              <label>X <input id="overlay-subtitle-x" type="number" min="0" max="3840" step="1"></label>
+              <label>Y <input id="overlay-subtitle-y" type="number" min="0" max="2160" step="1"></label>
+            </div>
+          </section>
+
+          <section class="panel config-section" data-config-section="asr">
+            <div class="panel-head">
+              <h2>ASR / 麦克风识别</h2>
+              <span id="asr-ready" class="status-pill">unknown</span>
+            </div>
+            <label>ASR Provider
+              <select id="asr-provider"></select>
+            </label>
+            <p class="reason-line">这里只切换语音识别 provider；具体模型路径和云端密钥仍在 conf.yaml 里维护。选择 none 表示明确关闭 ASR。</p>
+          </section>
+
+          <section class="panel config-section" data-config-section="bilibili">
+            <div class="panel-head">
+              <h2>Bilibili Live / 弹幕</h2>
+              <span id="bilibili-ready" class="status-pill">idle</span>
+            </div>
+            <label>房间号 <textarea id="bilibili-room-ids" rows="3" placeholder="每行一个房间号，或用逗号分隔"></textarea></label>
+            <label>SESSDATA <input id="bilibili-sessdata" type="password" autocomplete="new-password" placeholder="留空则不修改 / 连接时沿用配置"></label>
+            <p id="bilibili-secret-preview" class="hint"></p>
+            <label class="check-row"><input id="bilibili-speak" type="checkbox" checked> 弹幕回应时发声</label>
+            <label class="check-row"><input id="bilibili-use-proxy" type="checkbox"> 同时转发到 proxy-ws</label>
+            <label>Proxy URL <input id="bilibili-proxy-url" autocomplete="off" placeholder="ws://localhost:12395/proxy-ws"></label>
+            <label>测试弹幕 <input id="bilibili-test-text" autocomplete="off" value="六花，B站测试弹幕来了。"></label>
+            <div id="bilibili-detail" class="kv-list"></div>
+            <div class="action-row">
+              <button id="bilibili-connect" class="button primary" type="button">连接弹幕</button>
+              <button id="bilibili-disconnect" class="button" type="button">断开</button>
+              <button id="bilibili-test-event" class="button" type="button">发送测试弹幕</button>
+            </div>
+            <pre id="bilibili-result" class="result-box"></pre>
+          </section>
+
+          <section class="panel config-section" data-config-section="capture">
+            <div class="panel-head">
+              <h2>画面捕捉 / 多模态</h2>
+              <span id="capture-ready" class="status-pill">unknown</span>
+            </div>
+            <label class="check-row"><input id="screen-capture-enabled" type="checkbox"> 启用屏幕/窗口捕捉</label>
+            <label class="check-row"><input id="keyframe-upload-enabled" type="checkbox"> 允许关键帧进入多模态上下文</label>
+            <label class="check-row"><input id="debug-media-logging-enabled" type="checkbox"> 允许调试媒体日志</label>
+            <label>多模态 Provider
+              <select id="multimodal-provider"></select>
+            </label>
+            <label class="check-row"><input id="capture-enabled" type="checkbox"> 启用捕捉 worker</label>
+            <label>捕捉模式
+              <select id="capture-mode">
+                <option value="whitelist">白名单窗口</option>
+                <option value="foreground_debug">前台调试窗口</option>
+              </select>
+            </label>
+            <label class="check-row"><input id="capture-allow-foreground" type="checkbox"> 允许前台窗口调试捕捉</label>
+            <label class="check-row"><input id="capture-attach-turns" type="checkbox"> 自动附加到用户提问</label>
+            <label>窗口白名单 <textarea id="capture-window-list" rows="3"></textarea></label>
+            <label>进程白名单 <textarea id="capture-process-list" rows="3"></textarea></label>
+            <p class="reason-line">推荐流程：开启捕捉和关键帧，填写白名单，点“捕获关键帧”看到 captured，再正常问六花“能看到什么”。</p>
+          </section>
+
+          <section class="panel config-section" data-config-section="proactive">
+            <div class="panel-head">
+              <h2>Proactive</h2>
+              <span id="proactive-ready" class="status-pill">unknown</span>
+            </div>
+            <label class="check-row"><input id="proactive-screen" type="checkbox"> 画面主动发言</label>
+            <label class="check-row"><input id="proactive-idle" type="checkbox"> 空闲主动发言</label>
+            <label class="check-row"><input id="proactive-change-gate" type="checkbox"> 显著变化后才评论画面</label>
+            <div class="inline-grid">
+              <label>Tick (ms) <input id="proactive-interval" type="number" min="1000" step="1000"></label>
+              <label>Idle (ms) <input id="proactive-idle-ms" type="number" min="5000" step="1000"></label>
+              <label>Screen cooldown <input id="proactive-screen-cooldown" type="number" min="10000" step="1000"></label>
+              <label>Idle cooldown <input id="proactive-idle-cooldown" type="number" min="60000" step="1000"></label>
+              <label>Change threshold <input id="proactive-change-threshold" type="number" min="0.01" max="1" step="0.01"></label>
+              <label>Followup window (ms) <input id="proactive-followup-window" type="number" min="0" max="120000" step="1000"></label>
+            </div>
+          </section>
+
+          <section class="panel config-section" data-config-section="liveliness">
+            <div class="panel-head">
+              <h2>Liveliness</h2>
+              <span id="liveliness-ready" class="status-pill">local</span>
+            </div>
+            <label class="check-row"><input id="mood-enabled" type="checkbox"> 短期心情连续性</label>
+            <label class="check-row"><input id="mood-tts-adjust" type="checkbox"> 心情微调 TTS</label>
+            <div class="inline-grid">
+              <label>Mood half-life (min) <input id="mood-half-life" type="number" min="1" max="120" step="1"></label>
+              <label>Activity rotation (min) <input id="inner-life-rotation" type="number" min="5" max="120" step="1"></label>
+              <label>&#20027;&#25773;&#36523;&#20221;&#21517;&#31216; <input id="identity-host-name" type="text" maxlength="64"></label>
+              <label>&#24377;&#24149;&#40664;&#35748;&#21517;&#31216; <input id="identity-audience-name" type="text" maxlength="64"></label>
+            </div>
+            <label class="check-row"><input id="inner-life-enabled" type="checkbox"> 内心活动状态</label>
+            <label>活动池 <textarea id="inner-life-activities" rows="5"></textarea></label>
+          </section>
+
+          <section class="panel config-section" data-config-section="agent">
+            <div class="panel-head">
+              <h2>Agent / Memory</h2>
+              <span id="agent-ready" class="status-pill">unknown</span>
+            </div>
+            <label class="check-row"><input id="agent-tools-enabled" type="checkbox"> 自主工具调用</label>
+            <label class="check-row"><input id="agent-look-screen" type="checkbox"> look_at_screen</label>
+            <label class="check-row"><input id="agent-get-time" type="checkbox"> get_time</label>
+            <label class="check-row"><input id="agent-web-search" type="checkbox"> web_search</label>
+            <label class="check-row"><input id="agent-filler" type="checkbox"> 工具填充语</label>
+            <div class="inline-grid">
+              <label>结果前间隔 (ms) <input id="agent-pre-silence-ms" type="number" min="0" max="5000" step="100"></label>
+              <label>工具轮数 <input id="agent-max-rounds" type="number" min="1" max="5" step="1"></label>
+              <label>搜索超时 (s) <input id="agent-search-timeout" type="number" min="5" max="60" step="1"></label>
+              <label>摘要条数/类 <input id="memory-summary-per-kind" type="number" min="1" max="20" step="1"></label>
+              <label>容量/类 <input id="memory-per-kind-cap" type="number" min="5" max="500" step="5"></label>
+            </div>
+          </section>
+
+          <section class="panel config-section" data-config-section="mic">
+            <div class="panel-head">
+              <h2>Mic / Wake</h2>
+              <span id="mic-ready" class="status-pill">unknown</span>
+            </div>
+            <label class="check-row"><input id="wake-gate-enabled" type="checkbox"> 唤醒词门控</label>
+            <label class="check-row"><input id="mic-conversation-enabled" type="checkbox"> 麦克风多轮对话</label>
+            <label>唤醒词 <textarea id="wake-phrases" rows="3"></textarea></label>
+            <label>ASR 混淆别名 <textarea id="wake-asr-confusions" rows="3"></textarea></label>
+            <label>唤醒窗口 (ms) <input id="wake-window-ms" type="number" min="3000" step="1000"></label>
+          </section>
+
+          <section class="panel config-section wide" data-config-section="live2d-tuning">
+            <div class="panel-head">
+              <h2>Live2D 调参面板</h2>
+              <span id="live2d-tuning-ready" class="status-pill">unknown</span>
+            </div>
+
+            <div class="tuning-layout">
+              <div class="tuning-sidebar">
+                <label>类型
+                  <select id="preset-type-select">
+                    <option value="expression">表情预设</option>
+                    <option value="gesture">手势动作</option>
+                  </select>
+                </label>
+
+                <label>预设选择
+                  <select id="expression-preset-select"></select>
+                </label>
+
+                <div class="action-row">
+                  <button id="add-expression-preset" class="button" type="button">新建</button>
+                  <button id="delete-expression-preset" class="button danger" type="button">删除</button>
+                </div>
+
+                <div class="divider"></div>
+
+                <h3>全局设置</h3>
+                <label class="check-row">
+                  <input id="idle-micro-enabled" type="checkbox">
+                  <span>启用微待机</span>
+                </label>
+                <label>幅度
+                  <input id="idle-micro-amplitude" type="number" min="0" max="2" step="0.05" value="1.0">
+                </label>
+
+                <h3>Speaking Smile</h3>
+                <label>增益
+                  <input id="speaking-smile-gain" type="number" min="0" max="0.1" step="0.005" value="0.02">
+                </label>
+                <label>上限
+                  <input id="speaking-smile-max" type="number" min="0" max="1" step="0.05" value="0.25">
+                </label>
+              </div>
+
+              <div class="tuning-editor">
+                <div class="editor-header">
+                  <h3 id="editor-title">参数编辑</h3>
+                  <div class="preview-controls">
+                    <label class="check-row">
+                      <input id="live-preview-enabled" type="checkbox">
+                      <span>自动预览</span>
+                    </label>
+                    <button id="preview-now" class="button" type="button">预览当前</button>
+                  </div>
+                </div>
+
+                <div id="expression-params-grid" class="param-grid"></div>
+
+                <div class="action-row param-add-row">
+                  <input id="add-param-id" type="text" placeholder="参数 ID (如 ParamEyeLSmile)">
+                  <button id="add-param-button" class="button" type="button">添加参数</button>
+                </div>
+
+                <div class="inline-grid timing-controls">
+                  <label>Fade (ms)
+                    <input id="expression-fade-ms" type="number" min="0" step="50" value="300">
+                  </label>
+                  <label>Hold (ms)
+                    <input id="expression-hold-ms" type="number" min="0" step="100" value="2000">
+                  </label>
+                </div>
+
+                <div class="action-row save-row">
+                  <button id="save-live2d-presets" class="button primary" type="button">保存所有预设</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel config-section" data-config-section="logs">
+            <div class="panel-head">
+              <h2>Logs / Diagnostics</h2>
+              <span id="logs-ready" class="status-pill">unknown</span>
+            </div>
+            <div id="config-diagnostics-detail" class="kv-list"></div>
+            <div class="action-row">
+              <a class="button ghost" href="#logs">打开日志</a>
+              <a class="button ghost" href="#flow">查看事件</a>
+            </div>
+          </section>
+
+          <section class="config-actions">
+            <button id="save-settings" class="button primary" type="button">保存 Rikka 设置</button>
+            <button id="save-debug-config" class="button primary" type="button">保存 LLM/TTS 配置</button>
+            <button id="reset-settings" class="button danger" type="button">重置 Rikka 设置</button>
+            <span id="config-state" class="reason-line">配置未加载</span>
+          </section>
+        </form>
+      </section>
+
+      <section id="view-logs" class="view" aria-labelledby="view-title">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Errors</h2>
+              <button id="copy-log-summary" class="button" type="button">复制摘要</button>
+            </div>
+            <div id="error-list" class="log-list"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Log Tails</h2>
+              <button id="refresh-logs" class="button" type="button">刷新日志</button>
+            </div>
+            <div id="log-list" class="log-list"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="rikka.js"></script>
+</body>
+
+</html>

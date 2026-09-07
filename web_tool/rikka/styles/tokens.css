@@ -1,0 +1,71 @@
+:root {
+  color-scheme: dark;
+  --bg: #050506;
+  --bg-2: #0a0a0b;
+  --surface: #151517;
+  --surface-2: #1d1d20;
+  --surface-3: #29292d;
+  --line: #3d3d43;
+  --line-soft: #2a2a2f;
+  --text: #f5f5f7;
+  --text-2: #d7d7dd;
+  --muted: #9b9ba4;
+  --accent: #ff8fb2;
+  --accent-2: #68d8cb;
+  --ok: #6ee7a8;
+  --warn: #ffd166;
+  --bad: #ff7a86;
+  --info: #8ec5ff;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --font-ui: "Inter", "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
