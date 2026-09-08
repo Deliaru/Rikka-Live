@@ -29,21 +29,15 @@
 - 一个可用的对话服务配置；
 - 一个可用的语音合成配置。
 
-仓库中的 `frontend` 是子模块。建议克隆时直接初始化子模块，否则第一次打开网页时可能看不到前端页面。
+仓库已经内置可直接运行的 `frontend` 文件，不依赖外部前端仓库。完整克隆本仓库后即可启动服务。
 
 ## 安装与启动
 
 ### 1. 克隆项目
 
 ```bash
-git clone --recurse-submodules <你的 GitHub 仓库地址>
+git clone <你的 GitHub 仓库地址>
 cd <项目目录>
-```
-
-如果项目已经克隆但没有前端文件，执行：
-
-```bash
-git submodule update --init --recursive
 ```
 
 ### 2. 安装依赖
@@ -208,10 +202,10 @@ system_config:
 
 ### 页面显示 `Not Found`
 
-通常是前端子模块没有初始化：
+通常是前端文件没有完整下载，或服务不是从项目根目录启动。确认 `frontend/index.html` 存在，并重新拉取项目：
 
 ```bash
-git submodule update --init --recursive
+git pull
 ```
 
 然后重新启动服务。
@@ -235,8 +229,7 @@ git submodule update --init --recursive
 ## 更新项目
 
 ```bash
-git pull --recurse-submodules
-git submodule update --init --recursive
+git pull
 uv sync
 ```
 
